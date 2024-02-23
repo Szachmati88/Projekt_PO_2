@@ -1,0 +1,57 @@
+class UserDB:
+    def __init__(self):
+        self.users = []
+        self.next_id = 1
+
+    def get_all_users(self):
+        return self.users
+
+    def get_user_by_id(self, user_id):
+        for user in self.users:
+            if user['id'] == user_id:
+                return user
+        return None
+
+    def create_user(self, data):
+        if self._validate_user_data(data):
+            user = {
+                'id': self.next_id,
+                'firstName': data['firstName'],
+                'lastName': data['lastName'],
+                'age':  data['birthYear'],
+                'group': data['group']
+            }
+            self.users.append(user)
+            self.next_id += 1
+            return user
+        else:
+            return None
+
+    def update_user(self, user_id, data):
+        user = self.get_user_by_id(user_id)
+        if user and self._validate_user_data(data):
+            user.update({
+                'firstName': data.get('firstName', user['firstName']),
+                'lastName': data.get('lastName', user['lastName']),
+                'group': data.get('group', user['group'])
+            })
+            return user
+        else:
+            return None
+
+    def delete_user(self, user_id):
+        user = self.get_user_by_id(user_id)
+        if user:
+            self.users.remove(user)
+            return True
+        else:
+            return False
+
+    def _validate_user_data(self, data):
+        required_fields = ['firstName', 'lastName', 'birthYear', 'group']
+        if all(field in data for field in required_fields) and \
+                isinstance(data['birthYear'], int) and \
+                data['group'] in ['user', 'premium', 'admin']:
+            return True
+        else:
+            return False
